@@ -97,15 +97,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const modalTrigger = document.querySelectorAll('[data-modal]'), // получаем элемент по дата атрибутам
           modal = document.querySelector('.modal'),
           modalCloseBtn = document.querySelector('[data-close]');
-    
-    modalTrigger.forEach(btn => { // вешаем событие на все кнопки с одинаквыми атрибутами
-        btn.addEventListener('click', () => {
-            modal.classList.add('show'); // показываем окно
-            modal.classList.remove('hide'); // удаляем класс
-            // modal.classList.toggle('show'); // тоже самое только через тогле
-            document.body.style.overflow = 'hidden'; // добавляем класс запрещающий прокрутку
-        });
-    });
+
+    modalTrigger.forEach(btn => { 
+        btn.addEventListener('click', openModal);  
+    });  
 
     function closeModal() {
         modal.classList.add('hide'); // скрываем окно
@@ -113,6 +108,13 @@ window.addEventListener('DOMContentLoaded', () => {
         // modal.classList.toggle('show'); // тоже самое только через тогле
         document.body.style.overflow = ''; // восстанавливаем скрол после закрытия окна 
 
+    }
+
+    function openModal() {
+        modal.classList.add('show'); // показываем окно
+        modal.classList.remove('hide'); // удаляем класс
+        document.body.style.overflow = 'hidden';
+        clearInterval(modalTimerId); // удаем автопоказа окна если пользователь сам открыл окно
     }
     
     modalCloseBtn.addEventListener('click', closeModal);
@@ -133,5 +135,16 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
     });
+
+    const modalTimerId = setTimeout(openModal, 10000);
+
+    function showModalByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight -1) {
+            openModal();
+            window.removeEventListener('scroll', showModalByScroll);
+        }
+    }
+
+    window.addEventListener('scroll', showModalByScroll);
 
 });
