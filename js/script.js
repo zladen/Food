@@ -92,4 +92,46 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     setClock('.timer', deadline);
 
+    // Modal
+
+    const modalTrigger = document.querySelectorAll('[data-modal]'), // получаем элемент по дата атрибутам
+          modal = document.querySelector('.modal'),
+          modalCloseBtn = document.querySelector('[data-close]');
+    
+    modalTrigger.forEach(btn => { // вешаем событие на все кнопки с одинаквыми атрибутами
+        btn.addEventListener('click', () => {
+            modal.classList.add('show'); // показываем окно
+            modal.classList.remove('hide'); // удаляем класс
+            // modal.classList.toggle('show'); // тоже самое только через тогле
+            document.body.style.overflow = 'hidden'; // добавляем класс запрещающий прокрутку
+        });
+    });
+
+    function closeModal() {
+        modal.classList.add('hide'); // скрываем окно
+        modal.classList.remove('show'); // удаляем класс показа окна
+        // modal.classList.toggle('show'); // тоже самое только через тогле
+        document.body.style.overflow = ''; // восстанавливаем скрол после закрытия окна 
+
+    }
+    
+    modalCloseBtn.addEventListener('click', closeModal);
+
+    // закрытие окна при клике на подложку
+    modal.addEventListener('click', (e) => { // вешаем обработчик событий
+        if (e.target === modal) { // проверям куда кликнул пользователь
+            // modal.classList.add('hide'); // скрываем окно
+            // modal.classList.remove('show'); // удаляем класс показа окна
+            // document.body.style.overflow = ''; // восстанавливаем скрол после закрытия окна 
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => { // вешаем обработчик событий на весь докум
+        if (e.code === "Escape" && modal.classList.contains('show')) { // отлавливаем нажатие esc
+            closeModal(); // вызываем ф-ю закрытия окна
+        }
+
+    });
+
 });
