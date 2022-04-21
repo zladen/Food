@@ -1,4 +1,4 @@
-
+'use strict';
 // Tabs
 // Оборачиваем весь контент DOMContentLoader
 // Получаем элементы
@@ -215,4 +215,66 @@ window.addEventListener('DOMContentLoaded', () => {
         21,
         '.menu .container'
     ).render();
+
+    // Forms
+
+    const forms = document.querySelectorAll('form');
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    forms.forEach(item => {
+        postData(item);
+    });
+
+
+    function postData (form) { // обработчик событий
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); // отмена поведения браузера
+
+            let statusMessage = document.createElement('div'); // блок для показа сообщения
+            statusMessage.classList.add('status'); // добавляем классы блоку
+            statusMessage.textContent = message.loading;
+            form.appendChild(statusMessage); // добавляем сообщение к форме
+
+            const request = new XMLHttpRequest(); // формирование запроса
+            request.open('POST', 'server.php');
+            request.setRequestHeader('content-type', 'application/json; charset=utf-8'); // заголовки отправлять не нужно
+            const formData = new FormData(form); // сбор данных с форм
+
+            const object = {};
+            formData.forEach(function (value, key) {
+                object[key] = value;
+            });
+
+            const json = JSON.stringify(object);
+
+            request.send(json); // отправляем запрос
+             
+            request.addEventListener('load', () => { // отслеживаем событие отправки данных
+                if (request.status === 200) { // проверка статуса запроса
+                    console.log(request.response); // проверка себя
+                    statusMessage.textContent = message.success; // сообщение для пользователя что все ок
+                    form.reset(); // очистка данных с формы
+                    setTimeout(() => {
+                        statusMessage.remove(); // удаление сообщения
+                    }, 2000);
+
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+
+            });
+
+        });
+    }
+
 });
+
+
