@@ -95,8 +95,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Modal
 
     const modalTrigger = document.querySelectorAll('[data-modal]'), // получаем элемент по дата атрибутам
-          modal = document.querySelector('.modal'),
-          modalCloseBtn = document.querySelector('[data-close]');
+          modal = document.querySelector('.modal');
+        //   modalCloseBtn = document.querySelector('[data-close]');
 
     modalTrigger.forEach(btn => { 
         btn.addEventListener('click', openModal);  
@@ -114,14 +114,14 @@ window.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('show'); // показываем окно
         modal.classList.remove('hide'); // удаляем класс
         document.body.style.overflow = 'hidden';
-        clearInterval(modalTimerId); // удаем автопоказа окна если пользователь сам открыл окно
+        //clearInterval(modalTimerId); // удаем автопоказа окна если пользователь сам открыл окно
     }
     
-    modalCloseBtn.addEventListener('click', closeModal);
+    // modalCloseBtn.addEventListener('click', closeModal);
 
     // закрытие окна при клике на подложку
     modal.addEventListener('click', (e) => { // вешаем обработчик событий
-        if (e.target === modal) { // проверям куда кликнул пользователь
+        if (e.target === modal || e.target.getAttribute('data-close') == '') { // проверям куда кликнул пользователь
             // modal.classList.add('hide'); // скрываем окно
             // modal.classList.remove('show'); // удаляем класс показа окна
             // document.body.style.overflow = ''; // восстанавливаем скрол после закрытия окна 
@@ -136,7 +136,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     });
 
-    //const modalTimerId = setTimeout(openModal, 10000);
+    const modalTimerId = setTimeout(openModal, 50000);
 
     function showModalByScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight -1) {
@@ -220,7 +220,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const forms = document.querySelectorAll('form');
     const message = {
-        loading: 'Загрузка',
+        loading: 'img/form/spinner.svg',
         success: 'Спасибо! Скоро мы с вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
@@ -229,19 +229,18 @@ window.addEventListener('DOMContentLoaded', () => {
         postData(item);
     });
 
-    forms.forEach(item => {
-        postData(item);
-    });
-
-
     function postData (form) { // обработчик событий
         form.addEventListener('submit', (e) => {
             e.preventDefault(); // отмена поведения браузера
 
-            let statusMessage = document.createElement('div'); // блок для показа сообщения
-            statusMessage.classList.add('status'); // добавляем классы блоку
-            statusMessage.textContent = message.loading;
-            form.appendChild(statusMessage); // добавляем сообщение к форме
+            let statusMessage = document.createElement('img'); // блок для показа сообщения
+            statusMessage.src = message.loading; // добавляем классы блоку
+            statusMessage.style.cssText = `
+                dysplay: block;
+                margin: 0 auto;
+            `;
+            // form.appendChild(statusMessage); // добавляем сообщение к форме
+            form.insertAdjacentElement('afterend', statusMessage);
 
             const request = new XMLHttpRequest(); // формирование запроса
             request.open('POST', 'server.php');
@@ -260,19 +259,41 @@ window.addEventListener('DOMContentLoaded', () => {
             request.addEventListener('load', () => { // отслеживаем событие отправки данных
                 if (request.status === 200) { // проверка статуса запроса
                     console.log(request.response); // проверка себя
-                    statusMessage.textContent = message.success; // сообщение для пользователя что все ок
+                    showTanksModal(message.success);
+                    //statusMessage.textContent = message.success; // сообщение для пользователя что все ок
                     form.reset(); // очистка данных с формы
-                    setTimeout(() => {
-                        statusMessage.remove(); // удаление сообщения
-                    }, 2000);
-
+                    statusMessage.remove(); // удаление сообщения
                 } else {
-                    statusMessage.textContent = message.failure;
+                    // statusMessage.textContent = message.failure;
+                    showTanksModal(message.failure);
                 }
 
             });
 
         });
+    }
+
+    function showTanksModal(message) { // новое окно 
+        const prevModalDialog = document.querySelector('.modal__dialog'); // получаем елемент
+        prevModalDialog.classList.add('hide'); // // добавляем класс
+        openModal(); // открываем окно
+
+        const thanksModal = document.createElement('div'); // создаем блок
+        thanksModal.classList.add('modal__dialog'); // добавляем класс
+        thanksModal.innerHTML = ` 
+            <div class="modal__content">
+                <div class="modal__close" data-close>&times;</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `; // добавляем html конструкцию
+
+        document.querySelector('.modal').append(thanksModal); // размещаем элемент на странице
+        setTimeout(() => {
+            thanksModal.remove();
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            closeModal(); // закрываем окно
+        }, 4000); // сбрасываем форму
     }
 
 });
