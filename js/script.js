@@ -236,40 +236,36 @@ window.addEventListener('DOMContentLoaded', () => {
             let statusMessage = document.createElement('img'); // блок для показа сообщения
             statusMessage.src = message.loading; // добавляем классы блоку
             statusMessage.style.cssText = `
-                dysplay: block;
+                display: block;
                 margin: 0 auto;
             `;
             // form.appendChild(statusMessage); // добавляем сообщение к форме
             form.insertAdjacentElement('afterend', statusMessage);
-
-            const request = new XMLHttpRequest(); // формирование запроса
-            request.open('POST', 'server.php');
-            request.setRequestHeader('content-type', 'application/json; charset=utf-8'); // заголовки отправлять не нужно
+            
             const formData = new FormData(form); // сбор данных с форм
-
+            
             const object = {};
             formData.forEach(function (value, key) {
                 object[key] = value;
             });
 
-            const json = JSON.stringify(object);
-
-            request.send(json); // отправляем запрос
-             
-            request.addEventListener('load', () => { // отслеживаем событие отправки данных
-                if (request.status === 200) { // проверка статуса запроса
-                    console.log(request.response); // проверка себя
-                    showTanksModal(message.success);
-                    //statusMessage.textContent = message.success; // сообщение для пользователя что все ок
-                    form.reset(); // очистка данных с формы
-                    statusMessage.remove(); // удаление сообщения
-                } else {
-                    // statusMessage.textContent = message.failure;
-                    showTanksModal(message.failure);
-                }
-
-            });
-
+            fetch('server.php', {
+                method: "POST", // формируем метод запроса
+                headers: { // указываем заголовки
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(object) // отправляем форму
+            })
+            .then(data => data.text())
+            .then(data => {
+                console.log(data); // проверка себя
+                showTanksModal(message.success);
+                statusMessage.remove(); // удаление сообщения
+            }).catch(() => {
+                showTanksModal(message.failure);
+            }).finally(() => {
+                form.reset(); // очистка данных с формы
+            });             
         });
     }
 
@@ -295,6 +291,16 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal(); // закрываем окно
         }, 4000); // сбрасываем форму
     }
+    // Fetch API
+    // fetch('https://jsonplaceholder.typicode.com/posts', {
+    //     method: 'POST', // отправляем данные не сервер
+    //     body: JSON.stringify({name: 'Alex'}), // отправка объекта
+    //     headers: {
+    //         'Content-type': 'aplication/json' // настройка запроса
+    //     }
+    // })
+    // .then(response => response.json()) // возращает промис с сервера
+    // .then(json => console.log(json));
 
 });
 
