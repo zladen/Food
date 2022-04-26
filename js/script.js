@@ -207,29 +207,38 @@ window.addEventListener('DOMContentLoaded', () => {
     //         });
     //     });
 
-    // второй вариант динамического создание верстки
-    getResource('http://localhost:3000/menu')
-        .then(data => createCard(data));// вызов ф-ции
+    // get запросы с библиотекой axios
 
-    function createCard(data) { // ф-я получает массив
-        data.forEach(({img, altimg, title, descr, price}) => { // перебор массива и разбора на свойства
-            const element = document.createElement('div'); // создание блока
-            element.classList.add('menu__item'); // доавление класса
-            element.innerHTML = ` 
-                <img src=${img} alt=${altimg}>
-                <h3 class="menu__item-subtitle">${title}</h3>
-                <div class="menu__item-descr">${descr}</div>
-                <div class="menu__item-divider"></div>
-                <div class="menu__item-price">
-                    <div class="menu__item-cost">Цена:</div>
-                    <div class="menu__item-total"><span>${price}</span> грн/день</div>
-                </div>
-            
-            `; // создание верстки
-
-            document.querySelector('.menu .container').append(element); // размещение верстки на странице
+    axios.get('http://localhost:3000/menu') // cсоздаем запрос
+        .then(data => { // перебераем массив
+            data.data.forEach(({img, altimg, title, descr, price}) => { 
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); 
+            });
         });
-    }
+
+    // второй вариант динамического создание верстки
+    // getResource('http://localhost:3000/menu')
+    //     .then(data => createCard(data));// вызов ф-ции
+
+    // function createCard(data) { // ф-я получает массив
+    //     data.forEach(({img, altimg, title, descr, price}) => { // перебор массива и разбора на свойства
+    //         const element = document.createElement('div'); // создание блока
+    //         element.classList.add('menu__item'); // доавление класса
+    //         element.innerHTML = ` 
+    //             <img src=${img} alt=${altimg}>
+    //             <h3 class="menu__item-subtitle">${title}</h3>
+    //             <div class="menu__item-descr">${descr}</div>
+    //             <div class="menu__item-divider"></div>
+    //             <div class="menu__item-price">
+    //                 <div class="menu__item-cost">Цена:</div>
+    //                 <div class="menu__item-total"><span>${price}</span> грн/день</div>
+    //             </div>
+            
+    //         `; // создание верстки
+
+    //         document.querySelector('.menu .container').append(element); // размещение верстки на странице
+    //     });
+    // }
 
     
     // Forms
