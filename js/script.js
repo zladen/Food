@@ -318,11 +318,53 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal(); // закрываем окно
         }, 4000); // сбрасываем форму
     }
+    // Слайдер вариант 1
+
+    const slides = document.querySelectorAll('.offer__slide'), // получаем элемент через класс
+          prev = document.querySelector('.offer__slider-prev'), // получаем стрелку
+          next = document.querySelector('.offer__slider-next'), // кнопка некст
+          total = document.querySelector('#total'),
+          current = document.querySelector('#current');
     
-    //НАЙТИ нормамальный git ignore
-    fetch('http://localhost:3000/menu')
-        .then(data => data.json())
-        .then(res => console.log(res));
+    let slideIndex = 1; // определяем индекс для отслеживания номера слайда
+    
+    showSlides(slideIndex); // вызываем ф-ю слайдера
+
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    function showSlides(n) {
+        if (n > slides.length) { // переводим слайдер в начало если конец
+            slideIndex = 1;
+        }
+
+        if (n < 1) {
+            slideIndex = slides.length; // переводим в конец если начало
+        }
+        slides.forEach(item => item.style.display = 'none'); // скрываем слайды
+        slides[slideIndex - 1].style.display = 'block'; // показываем слайд
+
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    }
+
+    function plusSlides(n) { // функция увеличивающая индекс на 1
+        showSlides(slideIndex += n);
+    }
+
+    prev.addEventListener('click', () => { // обработчик событий
+        plusSlides(-1); // добавляет 1 к индексу
+    });
+
+    next.addEventListener('click', () => { // обработчик событий
+        plusSlides(1); // добавляет 1 к индексу
+    });
 
 });
 
