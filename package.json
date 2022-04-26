@@ -1,0 +1,22 @@
+{
+  "name": "food",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/Banderlog2013/Food.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Banderlog2013/Food/issues"
+  },
+  "homepage": "https://github.com/Banderlog2013/Food#readme",
+  "devDependencies": {
+    "json-server": "^0.17.0"
+  }
+}
