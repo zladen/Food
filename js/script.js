@@ -1,55 +1,56 @@
 'use strict';
-// Tabs
-// Оборачиваем весь контент DOMContentLoader
-// Получаем элементы
-window.addEventListener('DOMContentLoaded', () => {
-    const tabs = document.querySelectorAll('.tabheader__item'),
-          tabsContent = document.querySelectorAll('.tabcontent'),
-          tabsParent = document.querySelector('.tabheader__items');
-    // склеиваем все табы
+window.addEventListener('DOMContentLoaded', function() {
 
-    function hideTabContent() {
+    // Tabs
+    
+	let tabs = document.querySelectorAll('.tabheader__item'),
+		tabsContent = document.querySelectorAll('.tabcontent'),
+		tabsParent = document.querySelector('.tabheader__items');
+
+	function hideTabContent() {
+        
         tabsContent.forEach(item => {
             item.classList.add('hide');
             item.classList.remove('show', 'fade');
         });
 
         tabs.forEach(item => {
-            item.classList.remove('tabheader__item_active'); // удаляем класс активности
+            item.classList.remove('tabheader__item_active');
         });
+	}
+
+	function showTabContent(i = 0) {
+        tabsContent[i].classList.add('show', 'fade');
+        tabsContent[i].classList.remove('hide');
+        tabs[i].classList.add('tabheader__item_active');
     }
-
-    function showTabContent(i = 0) {
-        tabsContent[i].classList.add('show', 'fade'); // Показываем табы
-        tabsContent[i].classList.remove('hide'); 
-        tabs[i].classList.add('tabheader__item_active'); // lдобавляем класс активности
-
-    }
-
+    
     hideTabContent();
-    showTabContent(0);
+    showTabContent();
 
-    tabsParent.addEventListener('click', (event) => {
-        const target = event.target;
-        if (target && target.classList.contains('tabheader__item')) {
+	tabsParent.addEventListener('click', function(event) {
+		const target = event.target;
+		if(target && target.classList.contains('tabheader__item')) {
             tabs.forEach((item, i) => {
                 if (target == item) {
                     hideTabContent();
                     showTabContent(i);
                 }
             });
-        }
+		}
     });
-
+    
     // Timer
-    const deadline = '2022-04-17';
+
+    const deadline = '2022-06-11';
 
     function getTimeRemaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()),
-              days = Math.floor(t / (1000 * 60 * 60 *24)),
-              hours = Math.floor((t / (1000 * 60 * 60) % 24)),
-              minutes = Math.floor((t / 1000 / 60) % 60),
-              seconds = Math.floor((t / 1000) % 60);
+            days = Math.floor( (t/(1000*60*60*24)) ),
+            seconds = Math.floor( (t/1000) % 60 ),
+            minutes = Math.floor( (t/1000/60) % 60 ),
+            hours = Math.floor( (t/(1000*60*60) % 24) );
+
         return {
             'total': t,
             'days': days,
@@ -59,21 +60,23 @@ window.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function getZero(num) {
-        if (num >= 0 && num < 10) {
-            return `0${num}`;
+    function getZero(num){
+        if (num >= 0 && num < 10) { 
+            return '0' + num;
         } else {
             return num;
         }
     }
 
     function setClock(selector, endtime) {
+
         const timer = document.querySelector(selector),
-              days = timer.querySelector('#days'),
-              hours = timer.querySelector('#hours'),
-              minutes = timer.querySelector('#minutes'),
-              seconds = timer.querySelector('#seconds'),
-              timeInterval = setInterval(updateClock, 1000);
+            days = timer.querySelector("#days"),
+            hours = timer.querySelector('#hours'),
+            minutes = timer.querySelector('#minutes'),
+            seconds = timer.querySelector('#seconds'),
+            timeInterval = setInterval(updateClock, 1000);
+
         updateClock();
 
         function updateClock() {
@@ -84,70 +87,60 @@ window.addEventListener('DOMContentLoaded', () => {
             minutes.innerHTML = getZero(t.minutes);
             seconds.innerHTML = getZero(t.seconds);
 
-            if (t.total <=0) {
+            if (t.total <= 0) {
                 clearInterval(timeInterval);
             }
         }
-              
     }
+
     setClock('.timer', deadline);
 
     // Modal
 
-    const modalTrigger = document.querySelectorAll('[data-modal]'), // получаем элемент по дата атрибутам
-          modal = document.querySelector('.modal');
-        //   modalCloseBtn = document.querySelector('[data-close]');
+    const modalTrigger = document.querySelectorAll('[data-modal]'),
+        modal = document.querySelector('.modal');
 
-    modalTrigger.forEach(btn => { 
-        btn.addEventListener('click', openModal);  
-    });  
+    modalTrigger.forEach(btn => {
+        btn.addEventListener('click', openModal);
+    });
 
     function closeModal() {
-        modal.classList.add('hide'); // скрываем окно
-        modal.classList.remove('show'); // удаляем класс показа окна
-        // modal.classList.toggle('show'); // тоже самое только через тогле
-        document.body.style.overflow = ''; // восстанавливаем скрол после закрытия окна 
-
+        modal.classList.add('hide');
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
     }
 
     function openModal() {
-        modal.classList.add('show'); // показываем окно
-        modal.classList.remove('hide'); // удаляем класс
+        modal.classList.add('show');
+        modal.classList.remove('hide');
         document.body.style.overflow = 'hidden';
-        //clearInterval(modalTimerId); // удаем автопоказа окна если пользователь сам открыл окно
+        clearInterval(modalTimerId);
     }
-    
-    // modalCloseBtn.addEventListener('click', closeModal);
 
-    // закрытие окна при клике на подложку
-    modal.addEventListener('click', (e) => { // вешаем обработчик событий
-        if (e.target === modal || e.target.getAttribute('data-close') == '') { // проверям куда кликнул пользователь
-            // modal.classList.add('hide'); // скрываем окно
-            // modal.classList.remove('show'); // удаляем класс показа окна
-            // document.body.style.overflow = ''; // восстанавливаем скрол после закрытия окна 
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal || e.target.getAttribute('data-close') == "") {
             closeModal();
         }
     });
 
-    document.addEventListener('keydown', (e) => { // вешаем обработчик событий на весь докум
-        if (e.code === "Escape" && modal.classList.contains('show')) { // отлавливаем нажатие esc
-            closeModal(); // вызываем ф-ю закрытия окна
+    document.addEventListener('keydown', (e) => {
+        if (e.code === "Escape" && modal.classList.contains('show')) { 
+            closeModal();
         }
-
     });
 
-    const modalTimerId = setTimeout(openModal, 50000);
+    const modalTimerId = setTimeout(openModal, 300000);
+    // Изменил значение, чтобы не отвлекало
 
     function showModalByScroll() {
-        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight -1) {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
             openModal();
             window.removeEventListener('scroll', showModalByScroll);
         }
     }
-
     window.addEventListener('scroll', showModalByScroll);
 
-    // Используем классы для карточек
+    // Используем классы для создание карточек меню
 
     class MenuCard {
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -159,23 +152,23 @@ window.addEventListener('DOMContentLoaded', () => {
             this.classes = classes;
             this.parent = document.querySelector(parentSelector);
             this.transfer = 27;
-            this.changeToUAH();
+            this.changeToUAH(); 
         }
 
         changeToUAH() {
-            this.price = this.price * this.transfer;
+            this.price = this.price * this.transfer; 
         }
 
         render() {
             const element = document.createElement('div');
+
             if (this.classes.length === 0) {
-                this.element = 'menu__item';
-                element.classList.add(this.element);
+                this.classes = "menu__item";
+                element.classList.add(this.classes);
             } else {
                 this.classes.forEach(className => element.classList.add(className));
             }
 
-            
             element.innerHTML = `
                 <img src=${this.src} alt=${this.alt}>
                 <h3 class="menu__item-subtitle">${this.title}</h3>
@@ -190,57 +183,13 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const getResource = async (url) => { // формаирование get запроса
-        const res = await fetch(url);
-
-        if (!res.ok) {
-            throw new Error (`Could not fetch ${url}, status ${res.status}`);
-        }
-
-        return await res.json();
-    };
-    // get запрос
-    // getResource('http://localhost:3000/menu')
-    //     .then(data => { // перебераем массив
-    //         data.forEach(({img, altimg, title, descr, price}) => { //  lделаем деструктуризацию
-    //             new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // передаем свойства в конструктор
-    //         });
-    //     });
-
-    // get запросы с библиотекой axios
-
-    axios.get('http://localhost:3000/menu') // cсоздаем запрос
-        .then(data => { // перебераем массив
-            data.data.forEach(({img, altimg, title, descr, price}) => { 
-                new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); 
+    getResource('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({img, altimg, title, descr, price}) => {
+                new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
             });
         });
 
-    // второй вариант динамического создание верстки
-    // getResource('http://localhost:3000/menu')
-    //     .then(data => createCard(data));// вызов ф-ции
-
-    // function createCard(data) { // ф-я получает массив
-    //     data.forEach(({img, altimg, title, descr, price}) => { // перебор массива и разбора на свойства
-    //         const element = document.createElement('div'); // создание блока
-    //         element.classList.add('menu__item'); // доавление класса
-    //         element.innerHTML = ` 
-    //             <img src=${img} alt=${altimg}>
-    //             <h3 class="menu__item-subtitle">${title}</h3>
-    //             <div class="menu__item-descr">${descr}</div>
-    //             <div class="menu__item-divider"></div>
-    //             <div class="menu__item-price">
-    //                 <div class="menu__item-cost">Цена:</div>
-    //                 <div class="menu__item-total"><span>${price}</span> грн/день</div>
-    //             </div>
-            
-    //         `; // создание верстки
-
-    //         document.querySelector('.menu .container').append(element); // размещение верстки на странице
-    //     });
-    // }
-
-    
     // Forms
 
     const forms = document.querySelectorAll('form');
@@ -254,147 +203,164 @@ window.addEventListener('DOMContentLoaded', () => {
         bindPostData(item);
     });
 
-    const PostData = async (url, data) => {
-        const res = await fetch(url, {
-            method: "POST", // формируем метод запроса
-            headers: { // указываем заголовки
-                'content-type': 'application/json'
+    const postData = async (url, data) => {
+        let res = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
             },
-            body: data // отправляем форму
+            body: data
         });
+    
         return await res.json();
     };
 
+    async function getResource(url) {
+        let res = await fetch(url);
+    
+        if (!res.ok) {
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+        }
+    
+        return await res.json();
+    }
 
-    function bindPostData (form) { // обработчик событий
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
-            e.preventDefault(); // отмена поведения браузера
+            e.preventDefault();
 
-            let statusMessage = document.createElement('img'); // блок для показа сообщения
-            statusMessage.src = message.loading; // добавляем классы блоку
+            let statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
             statusMessage.style.cssText = `
                 display: block;
                 margin: 0 auto;
             `;
-            // form.appendChild(statusMessage); // добавляем сообщение к форме
             form.insertAdjacentElement('afterend', statusMessage);
-            
-            const formData = new FormData(form); // сбор данных с форм
-            
+        
+            const formData = new FormData(form);
+
             const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            PostData('http://localhost:3000/requests', json)
+            postData('http://localhost:3000/requests', json)
             .then(data => {
-                console.log(data); // проверка себя
-                showTanksModal(message.success);
-                statusMessage.remove(); // удаление сообщения
+                console.log(data);
+                showThanksModal(message.success);
+                statusMessage.remove();
             }).catch(() => {
-                showTanksModal(message.failure);
+                showThanksModal(message.failure);
             }).finally(() => {
-                form.reset(); // очистка данных с формы
-            });             
+                form.reset();
+            });
         });
     }
 
-    function showTanksModal(message) { // новое окно 
-        const prevModalDialog = document.querySelector('.modal__dialog'); // получаем елемент
-        prevModalDialog.classList.add('hide'); // // добавляем класс
-        openModal(); // открываем окно
+    function showThanksModal(message) {
+        const prevModalDialog = document.querySelector('.modal__dialog');
 
-        const thanksModal = document.createElement('div'); // создаем блок
-        thanksModal.classList.add('modal__dialog'); // добавляем класс
-        thanksModal.innerHTML = ` 
+        prevModalDialog.classList.add('hide');
+        openModal();
+
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML = `
             <div class="modal__content">
-                <div class="modal__close" data-close>&times;</div>
+                <div class="modal__close" data-close>×</div>
                 <div class="modal__title">${message}</div>
             </div>
-        `; // добавляем html конструкцию
-
-        document.querySelector('.modal').append(thanksModal); // размещаем элемент на странице
+        `;
+        document.querySelector('.modal').append(thanksModal);
         setTimeout(() => {
             thanksModal.remove();
             prevModalDialog.classList.add('show');
             prevModalDialog.classList.remove('hide');
-            closeModal(); // закрываем окно
-        }, 4000); // сбрасываем форму
+            closeModal();
+        }, 4000);
     }
-    // Слайдер вариант 1
 
-    const slides = document.querySelectorAll('.offer__slide'), // получаем элемент через класс
-          prev = document.querySelector('.offer__slider-prev'), // получаем стрелку
-          next = document.querySelector('.offer__slider-next'), // кнопка некст
-          total = document.querySelector('#total'),
-          current = document.querySelector('#current'),
-          slidesWrapper = document.querySelector('.offer__slider-wrapper'),
-          slidesField = document.querySelector('.offer__slider-inner'),
-          width = window.getComputedStyle(slidesWrapper).width;
-    
-    let slideIndex = 1; // определяем индекс для отслеживания номера слайда
+    // Slider
+
     let offset = 0;
-    
-    // showSlides(slideIndex); // вызываем ф-ю слайдера
+    let slideIndex = 1;
 
-    // if (slides.length < 10) {
-    //     total.textContent = `0${slides.length}`;
-    // } else {
-    //     total.textContent = slides.length;
-    // }
-
-    // function showSlides(n) {
-    //     if (n > slides.length) { // переводим слайдер в начало если конец
-    //         slideIndex = 1;
-    //     }
-
-    //     if (n < 1) {
-    //         slideIndex = slides.length; // переводим в конец если начало
-    //     }
-    //     slides.forEach(item => item.style.display = 'none'); // скрываем слайды
-    //     slides[slideIndex - 1].style.display = 'block'; // показываем слайд
-
-    //     if (slides.length < 10) {
-    //         current.textContent = `0${slideIndex}`;
-    //     } else {
-    //         current.textContent = slideIndex;
-    //     }
-    // }
-
-    // function plusSlides(n) { // функция увеличивающая индекс на 1
-    //     showSlides(slideIndex += n);
-    // }
-
-    // prev.addEventListener('click', () => { // обработчик событий
-    //     plusSlides(-1); // добавляет 1 к индексу
-    // });
-
-    // next.addEventListener('click', () => { // обработчик событий
-    //     plusSlides(1); // добавляет 1 к индексу
-    // });
-
-    // Слайдер 2
+    const slides = document.querySelectorAll('.offer__slide'),
+        slider = document.querySelector('.offer__slider'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        total = document.querySelector('#total'),
+        current = document.querySelector('#current'),
+        slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+        width = window.getComputedStyle(slidesWrapper).width,
+        slidesField = document.querySelector('.offer__slider-inner');
 
     if (slides.length < 10) {
         total.textContent = `0${slides.length}`;
-        total.textContent = `0${slideIndex}`;
-        } else {
-            total.textContent = slides.length;
-            total.textContent = slideIndex;
-        }
-
-    slidesField.style.width = 100 * slides.length + '%'; // ширина слайдов
-    slidesField.style.display = 'flex'; // меняем свойство на флекс
-    slidesField.style.transition = '0.5s all'; // плавность переключения слайдов
-    slidesWrapper.style.overflow = 'hidden'; // скрываем все элементы которые не попадают в область видимости
+        current.textContent =  `0${slideIndex}`;
+    } else {
+        total.textContent = slides.length;
+        current.textContent =  slideIndex;
+    }
     
-    slides.forEach(slide => { // передераем слайды
-        slide.style.width = width; // устанавливаем ширину
+    slidesField.style.width = 100 * slides.length + '%';
+    slidesField.style.display = 'flex';
+    slidesField.style.transition = '0.5s all';
+
+    slidesWrapper.style.overflow = 'hidden';
+
+    slides.forEach(slide => {
+        slide.style.width = width;
     });
 
+    slider.style.position = 'relative';
+
+    const indicators = document.createElement('ol'),
+          dots = [];
+    indicators.classList.add('carousel-indicators');
+    indicators.style.cssText = `
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 15;
+        display: flex;
+        justify-content: center;
+        margin-right: 15%;
+        margin-left: 15%;
+        list-style: none;
+    `; 
+    slider.append(indicators);
+
+    for (let i = 0; i < slides.length; i++) {
+        const dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i + 1);
+        dot.style.cssText = `
+            box-sizing: content-box;
+            flex: 0 1 auto;
+            width: 30px;
+            height: 6px;
+            margin-right: 3px;
+            margin-left: 3px;
+            cursor: pointer;
+            background-color: #fff;
+            background-clip: padding-box;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            opacity: .5;
+            transition: opacity .6s ease;
+        `;
+        if (i == 0) {
+            dot.style.opacity = 1;
+        }
+        indicators.append(dot);
+        dots.push(dot);
+    }
+
     next.addEventListener('click', () => {
-        if (offset == +width.slice(0, width.length -2) * (slides.length -1)) {
+        if (offset == (+width.slice(0, width.length - 2) * (slides.length - 1))) {
             offset = 0;
         } else {
-            offset += +width.slice(0, width.length -2);
+            offset += +width.slice(0, width.length - 2); 
         }
+
         slidesField.style.transform = `translateX(-${offset}px)`;
 
         if (slideIndex == slides.length) {
@@ -404,18 +370,20 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         if (slides.length < 10) {
-            current.textContent = `0${slideIndex}`;
+            current.textContent =  `0${slideIndex}`;
         } else {
-            current.textContent = slideIndex; 
+            current.textContent =  slideIndex;
         }
 
+        dots.forEach(dot => dot.style.opacity = ".5");
+        dots[slideIndex-1].style.opacity = 1;
     });
 
     prev.addEventListener('click', () => {
         if (offset == 0) {
-            offset = +width.slice(0, width.length -2) * (slides.length -1);
+            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
         } else {
-            offset -= +width.slice(0, width.length -2);
+            offset -= +width.slice(0, width.length - 2);
         }
 
         slidesField.style.transform = `translateX(-${offset}px)`;
@@ -427,12 +395,34 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         if (slides.length < 10) {
-            current.textContent = `0${slideIndex}`;
+            current.textContent =  `0${slideIndex}`;
         } else {
-            current.textContent = slideIndex; 
+            current.textContent =  slideIndex;
         }
+
+        dots.forEach(dot => dot.style.opacity = ".5");
+        dots[slideIndex-1].style.opacity = 1;
     });
 
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            const slideTo = e.target.getAttribute('data-slide-to');
+
+            slideIndex = slideTo;
+            offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+
+            slidesField.style.transform = `translateX(-${offset}px)`;
+
+            if (slides.length < 10) {
+                current.textContent =  `0${slideIndex}`;
+            } else {
+                current.textContent =  slideIndex;
+            }
+
+            dots.forEach(dot => dot.style.opacity = ".5");
+            dots[slideIndex-1].style.opacity = 1;
+        });
+    });
 });
 
 
